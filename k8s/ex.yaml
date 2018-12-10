@@ -1,0 +1,119 @@
+---
+{
+   "apiVersion": "v1",
+   "kind": "Service",
+   "metadata": {
+      "name": "test"
+   },
+   "spec": {
+      "ports": [
+         {
+            "name": "restapi-https-port",
+            "port": 443,
+            "targetPort": 443
+         },
+         {
+            "name": "restapi-http-port",
+            "port": 80,
+            "targetPort": 80
+         }
+      ],
+      "selector": {
+         "app": "restapi",
+         "env": "test"
+      },
+      "type": "LoadBalancer"
+   }
+}
+---
+{
+   "apiVersion": "apps/v1",
+   "kind": "Deployment",
+   "metadata": {
+      "name": "test"
+   },
+   "spec": {
+      "selector": {
+         "matchLabels": {
+            "app": "restapi",
+            "env": "test"
+         }
+      },
+      "template": {
+         "metadata": {
+            "labels": {
+               "app": "restapi",
+               "env": "test"
+            }
+         },
+         "spec": {
+            "containers": [
+               {
+                  "command": [
+                     "gunicorn",
+                     "-w",
+                     "16",
+                     "--bind",
+                     "0.0.0.0:5000",
+                     "--chdir",
+                     "/restapi/code",
+                     "app:app"
+                  ],
+                  "image": "restapi/restapi",
+                  "imagePullPolicy": "IfNotPresent",
+                  "livenessProbe": {
+                     "failureThreshold": 3,
+                     "httpGet": {
+                        "path": "/",
+                        "port": "5000"
+                     },
+                     "initialDelaySeconds": 1,
+                     "periodSeconds": 3
+                  },
+                  "name": "restapi",
+                  "ports": [
+                     {
+                        "containerPort": 5000
+                     }
+                  ],
+                  "readinessProbe": {
+                     "failureThreshold": 3,
+                     "httpGet": {
+                        "path": "/",
+                        "port": "5000"
+                     },
+                     "initialDelaySeconds": 1,
+                     "periodSeconds": 3
+                  },
+                  "resources": {
+                     "limits": {
+                        "cpu": "500m",
+                        "memory": "2Gi"
+                     },
+                     "requests": {
+                        "cpu": "100m",
+                        "memory": "1Gi"
+                     }
+                  },
+                  "volumeMounts": [
+                     {
+                        "mountPath": "/",
+                        "name": "volume-1",
+                        "readOnly": false
+                     }
+                  ]
+               }
+            ],
+            "volumes": [
+               {
+                  "hostPath": {
+                     "path": "/restapi"
+                  },
+                  "name": "restapi"
+               }
+            ]
+         }
+      }
+   }
+}
+...
