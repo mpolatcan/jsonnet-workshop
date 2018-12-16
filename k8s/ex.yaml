@@ -2,18 +2,35 @@
 "apiVersion": "Service"
 "kind": "v1"
 "metadata": 
+  "annotations": 
+    "kubernetes.io/hostname": "minecraft"
+  "clusterName": "test-cluster"
   "name": "minecraft-service"
+  "namespace": "default"
 "spec": 
+  "externalIPs": 
+  - "xx.xx.xx.xx"
+  "externalName": "test"
+  "externalTrafficPolicy": "test"
+  "loadBalancerIP": "xx.xx.xx.xx"
+  "loadBalancerSourceRanges": 
+  - "xx.xx.xx.xx/x"
   "ports": 
   - "name": "minecraft-server"
     "port": 8080
+    "protocol": "TCP"
     "targetPort": 8080
   - "name": "minecraft-client"
     "port": 25675
+    "protocol": "TCP"
     "targetPort": 25675
   "selector": 
     "app": "minecraft"
     "env": "test"
+  "sessionAffinity": "test"
+  "sessionAffinityConfig": 
+    "clientIp": 
+      "timeoutSeconds": 3
   "type": "ClusterIP"
 ---
 "apiVersion": "apps/v1"
@@ -81,7 +98,11 @@
             "memory": "512Mi"
         "securityContext": 
           "runAsGroup": 1000
+          "runAsNonRoot": true
           "runAsUser": 1000
+          "seLinuxOptions": 
+            "role": "admin"
+            "user": "mpolatcan"
         "stdin": true
         "stdinOnce": true
         "tty": true

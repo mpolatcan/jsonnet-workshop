@@ -1,6 +1,5 @@
-/*  Kubernetes Deployment API Specification with Jsonnet
-    Written by Mutlu Polatcan
-    Updated at 15.12.2018 */
+/*  Kubernetes Deployment API v1 apps Specification with Jsonnet
+    Written by Mutlu Polatcan */
 {
     create(name): {
         apiVersion: 'apps/v1',

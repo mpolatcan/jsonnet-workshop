@@ -1,15 +1,15 @@
-/*  Kubernetes Container API Specification with Jsonnet
-    Written by Mutlu Polatcan
-    Updated at 15.12.2018 */
+/*  Kubernetes Container API v1 Core Specification with Jsonnet
+    Written by Mutlu Polatcan*/
+local constants = import '../utils/constants.libsonnet';
 {   
     create(name): {
         name: name, 
-        imagePullPolicy: self.pullpolicies.IfNotPresent,
+        imagePullPolicy: constants.image.pullpolicies.IfNotPresent,
         img(image):: self { image: image },
         imgPullPolicy(policy):: self { imagePullPolicy: policy },
         cmd(cmd):: self { command: cmd },
         args(args):: self { args: args },
-        port(containerPort, hostPort=null, name=null, protocol=self.portprotocols.TCP):: self {
+        port(containerPort, hostPort=null, name=null, protocol=constants.port.protocols.TCP):: self {
             ports+: [
                 {
                     containerPort: containerPort,
@@ -76,8 +76,6 @@
             },
             lifeCycleErr:: error 'Valid lifecycle types: ["postStart","preStop"]'
         },
-        pullpolicies:: { IfNotPresent: 'IfNotPresent', Always: 'Always' },
-        portprotocols:: { TCP: 'TCP', UDP: 'UDP', SCTP: 'SCTP' },
         _probes:: { 
             Exec(cmd): { exec: { command: cmd } },
             TcpSocket(port,host): { tcpSocket: { port: port, host: host } }, 
@@ -134,11 +132,14 @@
             allowPrivilegeEscalate(opt):: self { securityContext+: { allowPrivilegeEscalation: opt } },
             procMnt(opt):: self { securityContext+: { procMount: opt } },
             readOnlyRootFS(opt):: self { securityContext+: { readOnlyRootFilesystem: opt } },
-            runAsGrp(gid):: self { securityContext+: { runAsGroup: gid } },
+            runAsGroup(gid):: self { securityContext+: { runAsGroup: gid } },
             runAsNonRoot(opt):: self { securityContext+: { runAsNonRoot: opt } },
-            runAsUsr(uid):: self { securityContext+: { runAsUser: uid } },
-            seLinuxOpts():: self {
-                // TODO SELinux options will be added
+            runAsUser(uid):: self { securityContext+: { runAsUser: uid } },
+            seLinuxOpts:: self {
+               user(usr):: self { securityContext+: { seLinuxOptions+: { user: usr } } },   
+               role(role):: self { securityContext+: { seLinuxOptions+: { role: role } } },
+               level(level):: self { securityContext+: { seLinuxOptions+: { level: level } } },
+               type(type):: self { securityContext+: { seLinuxOptions+: { type: type } } },
             },
             addCapability(capability):: self { securityContext+: { capabilites+: { add+: [ capability ] } } },
             dropCapability(capability):: self { securityContext+: { capabilites+: { drop+: [ capability ] } } }
