@@ -36,19 +36,30 @@
       "containers": 
       - "command": "echo hello minecraft!"
         "env": 
-        - "name": "test"
+        - "name": "app"
+          "value": "minecraft"
+        - "name": "app"
           "valueFrom": 
-            "secretKeyRef": 
-              "key": "minecraft"
+            "configMapKeyRef": 
+              "key": "name"
+        - "name": "app"
+          "valueFrom": 
+            "fieldRef": 
+              "fieldPath": "test"
+        - "name": "app"
+          "valueFrom": 
+            "resourceFieldRef": 
+              "resource": "test"
         "image": "mpolatcan/minecraft"
         "imagePullPolicy": "IfNotPresent"
-        "livenessProbe": 
-          "httpGet": 
-            "httpHeaders": 
-            - "name": "test"
-              "value": "test"
-            "path": "/"
-            "port": 8080
+        "lifecycle": 
+          "postStart": 
+            "exec": 
+              "command": "echo"
+          "preStop": 
+            "tcpSocket": 
+              "host": "localhost"
+              "port": 8080
         "name": "minecraft"
         "ports": 
         - "containerPort": 8080
@@ -59,9 +70,8 @@
           "protocol": "TCP"
         "readinessProbe": 
           "exec": 
-            "command": 
-            - "echo"
-            - "hello"
+            "command": "echo hello world"
+          "initialDelaySeconds": 3
         "resources": 
           "limits": 
             "cpu": "500Mi"
